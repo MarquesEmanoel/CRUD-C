@@ -1,21 +1,27 @@
 /*Síntese
-Objetivo: Fazer um CRUD de produtos utilizando vetores.
-Entrada: Descrição dos Produtos, Códigos dos produtos, preço dos produtos.
-Saida: Produtos cadastrados.*/
+Objetivo: Fazer um CRUD de produtos utilizando vetores e registro sem função;
+Autor: Emanoel Roberto Marques da Silva;
+Data da ultima modificação: 06/03/2019;
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define QTD_PRODUTOS 10
 
+struct cadastro{
+	char nome[20];
+	float preco;
+	int codigo;
+};
+
 int main(int argc, char *argv[]) {
- char descricoes[20][QTD_PRODUTOS];
- int codigos[QTD_PRODUTOS],contador=0,buscaProdutos,opcao,i,flag=0;
- float precos[QTD_PRODUTOS];
+ struct cadastro produtos[QTD_PRODUTOS],backup[QTD_PRODUTOS];
+ int contador=0,buscaProdutos,opcao,i,flag=0,flagBackup=0,contadorBackup=0;
  
  //ciclo do menu principal
  do{
- 	printf("		Menu Principal\n\n1- Verificar os produtos cadastrados.\n2- Cadastrar novo produto.\n3- Buscar um produto cadastrado.\n4- Excluir um produto.\n5- Alterar um produto.\n0- Sair.\n");
+ 	printf("		Menu Principal\n\n1- Verificar os produtos cadastrados.\n2- Cadastrar novo produto.\n3- Buscar um produto cadastrado.\n4- Excluir um produto.\n5- Alterar um produto.\n6- Salvar Backup.\n7- Restaurar Backup Salvo.\n0- Sair.\n");
 	scanf("\n%d",&opcao);
 	switch(opcao){
 		system("cls");
@@ -23,7 +29,7 @@ int main(int argc, char *argv[]) {
 			system("cls");
 			printf("Codigo		Descricao		Preco\n");
 			for(i=0;i<contador;i++){
-				printf("%d		%s			R$%2.f\n",codigos[i],descricoes[i],precos[i]);
+				printf("%d		%s			R$%2.f\n",produtos[i].codigo,produtos[i].nome,produtos[i].preco);
 			}
 			system("pause");
 			break;
@@ -34,13 +40,13 @@ int main(int argc, char *argv[]) {
 				system("cls");
 				fflush(stdin);
 				printf("Digite o nome do produto: ");
-				gets(descricoes[contador]);
+				gets(produtos[contador].nome);
 				do{
 					flag=0;
 					printf("Digite o Codigo do Produto: ");	
-					scanf("%d",&codigos[contador]);
+					scanf("%d",&produtos[contador].codigo);
 					for(i=0;i<contador;i++){
-						if(codigos[contador] == codigos[i]){
+						if(produtos[contador].codigo == produtos[i].codigo){
 							system("cls");
 							printf("\nCodigo ja cadastrado no sistema, digite um codigo valido ou altere o produto ja cadastrado.\n");
 							flag=1;
@@ -48,7 +54,7 @@ int main(int argc, char *argv[]) {
 					}
 				}while(flag==1);
 				printf("Digite o Valor do Produto: ");	
-				scanf("%f",&precos[contador]);
+				scanf("%f",&produtos[contador].preco);
 				contador++;	
 				printf("Produto Cadastrado com sucesso!\n");
 				system("pause");
@@ -64,8 +70,8 @@ int main(int argc, char *argv[]) {
 			printf("Digite o codigo do produto a ser buscado: ");
 			scanf("%d",&buscaProdutos);
 			for(i=0;i<contador;i++){
-				if(buscaProdutos == codigos[i]){
-					printf("Produto encontrado\nCodigo: %d\nDescricao: %s\nPreco: %2.f\n",codigos[i],descricoes[i],precos[i]);
+				if(buscaProdutos == produtos[i].codigo){
+					printf("Produto encontrado\nCodigo: %d\nDescricao: %s\nPreco: %2.f\n",produtos[i].codigo,produtos[i].nome,produtos[i].preco);
 					system("pause");
 					system("cls");
 					flag=1;
@@ -84,10 +90,10 @@ int main(int argc, char *argv[]) {
 			printf("Digite o codigo do produto a ser excluido: ");
 			scanf("%d",&buscaProdutos);
 			for(i=0;i<contador;i++){
-				if(buscaProdutos == codigos[i]){
-					codigos[i]=codigos[contador-1];
-					strcpy(descricoes[i],descricoes[contador-1]);
-					precos[i]=precos[contador-1];
+				if(buscaProdutos == produtos[i].codigo){
+					produtos[i].codigo=produtos[contador-1].codigo;
+					strcpy(produtos[i].nome,produtos[contador-1].nome);
+					produtos[i].preco=produtos[contador-1].preco;
 					printf("\nProduto excluido com sucesso\n");
 					contador--;
 					system("pause");
@@ -109,12 +115,12 @@ int main(int argc, char *argv[]) {
 			printf("Digite o codigo do produto a ser alterado: ");
 			scanf("%d",&buscaProdutos);
 			for(i=0;i<contador;i++){
-				if(buscaProdutos == codigos[i]){
+				if(buscaProdutos == produtos[i].codigo){
 					fflush(stdin);
 					printf("\nDigite o nome do produto: ");
-					gets(descricoes[i]);
+					gets(produtos[i].nome);
 					printf("\nDigite o preco do produto: ");
-					scanf("%f",&precos[i]);
+					scanf("%f",&produtos[i].preco);
 					i=contador;
 				}
 				printf("\nProduto alterado com sucesso\n");
@@ -127,6 +133,53 @@ int main(int argc, char *argv[]) {
 				system("pause");
 				system("cls");
 			}
+			break;
+		}
+		case 6:{
+			//Backup
+			for(i=0;i<contador;i++){
+				backup[i].codigo=produtos[i].codigo;
+				strcpy(backup[i].nome,produtos[i].nome);
+				backup[i].preco=produtos[i].preco;
+			}
+			system("cls");
+			contadorBackup=contador;
+			printf("Backup Concluido!\n");
+			flagBackup=1;
+			break;
+		}
+		case 7:{
+			//Restaurar Backup
+			system("cls");
+			printf("Tem certeza que deseja prosseguir com o backup? Todos os arquivos não salvos serao perdidos\n1- Continuar\n2- Retornar ao menu principal\n");
+			scanf("%d",&opcao);
+			switch(opcao){
+				case 1:{
+					if(flagBackup==1){
+						for(i=0;i<contador;i++){
+							produtos[i].codigo=backup[i].codigo;
+							strcpy(produtos[i].nome,backup[i].nome);
+							produtos[i].preco=backup[i].preco;
+						}
+						contador=contadorBackup;
+						printf("\nBackup restaurado com sucesso!\n");
+					}else{
+						system("cls");
+						printf("Restauracao nao concluida, nao ha nenhum backup cadastrado atualmente\n");
+					}
+					break;
+				}
+				case 2:{
+					system("cls");
+					printf("Operação cancelada com sucesso\n");
+					break;
+				}
+				default:{
+					printf("Opcao invalida!");
+					system("pause");
+					break;
+				}
+				}
 			break;
 		}
 		case 0:{
